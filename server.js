@@ -21,5 +21,5 @@ router.get("/accounts/", (req, res) => {
 app.use(apiRoot, router);
 
 app.listen(port, () => {
-  console.log("Server is up! :D");
+  console.log("Server is running! :D");
 });
