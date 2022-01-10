@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const package = require("./db.js");
+const package = require("./db.json");
+const fs = require("fs");
 
 const port = process.env.port || process.env.PORT || 5000;
 const apiRoot = "/api";
@@ -14,12 +15,40 @@ app.options("*", cors());
 
 const router = express.Router();
 
-router.get("/accounts/", (req, res) => {
+router.get("/accounts", (req, res) => {
   return res.send(package);
 });
 
+router.post("/accounts", (req, res) => {
+  const bodyRequest = req.body;
+  const accountsFileData = JSON.parse(
+    fs.readFileSync("./db.json", { encoding: "utf8", flag: "r" })
+  );
+  const user = {
+    name: bodyRequest.name,
+    mail: bodyRequest.mail,
+    document: bodyRequest.document,
+    phone: bodyRequest.phone,
+    status: bodyRequest.status,
+  };
+
+  accountsFileData.push(user);
+  fs.writeFileSync("./db.json", JSON.stringify(accountsFileData));
+
+  return res.status(201).json(user);
+});
+
+router.put("/accounts/:id", (req, res) => {
+  const bodyRequest = req.body;
+  const users = req.params.id;
+  // const account =package[id]    ID check
+
+  return res.status(201).json();
+});
 app.use(apiRoot, router);
 
 app.listen(port, () => {
-  console.log("Server is running! :D");
+  console.log("Server is running...");
 });
+
+//LETS USE STRING TEMPLATE ON THE PUT VIA REACT!!!!!!!!!!!!!
