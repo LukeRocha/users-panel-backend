@@ -1,10 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const package = require("./db.json");
+const db = require("./db.json");
 const fs = require("fs");
 
-const port = process.env.port || process.env.PORT || 5000;
+const port = process.env.port || process.env.PORT || 8000;
 const apiRoot = "/api";
 const app = express();
 
@@ -16,7 +16,7 @@ app.options("*", cors());
 const router = express.Router();
 
 router.get("/accounts", (req, res) => {
-  return res.send(package);
+  return res.send(db);
 });
 
 router.post("/accounts", (req, res) => {
@@ -39,11 +39,23 @@ router.post("/accounts", (req, res) => {
 });
 
 router.put("/accounts/:id", (req, res) => {
-  const bodyRequest = req.body;
-  const users = req.params.id;
-  // const account =package[id]    ID check
+  let users = JSON.parse(
+    fs.readFileSync("./db.json", { encoding: "utf8", flag: "r" })
+  );
+  let bodyRequest = req.body;
+  const user = req.params.id;
+  const account = users[user];
 
-  return res.status(201).json();
+  if (!account) {
+    res.status(404).json({ error: "User doesn't exists" });
+  }
+
+  account.status = bodyRequest.status;
+
+  users[user].status = bodyRequest.status;
+  fs.writeFileSync("./db.json", JSON.stringify(users));
+
+  return res.status(201).json(users);
 });
 app.use(apiRoot, router);
 
