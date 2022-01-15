@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const db = require("./db.json");
 const fs = require("fs");
 
-const port = process.env.port || process.env.PORT || 8000;
+const port = process.env.port || process.env.PORT || 5000;
 const apiRoot = "/api";
 const app = express();
 
