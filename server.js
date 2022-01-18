@@ -50,9 +50,7 @@ router.put("/accounts/:id", (req, res) => {
     res.status(404).json({ error: "User doesn't exists" });
   }
 
-  account.status = bodyRequest.status;
-
-  users[user].status = bodyRequest.status;
+  users[user] = bodyRequest;
   fs.writeFileSync("./db.json", JSON.stringify(users));
 
   return res.status(201).json(users);
