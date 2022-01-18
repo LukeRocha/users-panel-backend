@@ -26,5 +26,40 @@
     "document": "763.556.345-00",
     "phone": "21 98447-2234",
     "status": "online"
+  },
+  {
+    "name": "Lucas Rocha Santos",
+    "mail": "lucas.rocha@mailing.com",
+    "document": "265.445.589-44",
+    "phone": "13 99855-8985",
+    "status": "waiting activation"
+  },
+  {
+    "name": "GIlbertinho da Silva",
+    "mail": "gilberto.silva@mail.com",
+    "document": "855.356.366-44",
+    "phone": "81 99886-8756",
+    "status": "offline"
+  },
+  {
+    "name": "Paulo de Lima",
+    "mail": "gilberto.silva@email.com",
+    "document": "488.987.009-56",
+    "phone": "13 99855-8985",
+    "status": "offline"
+  },
+  {
+    "name": "Joao da silva peres",
+    "mail": "jaop@mail.com",
+    "document": "987.453.332-88",
+    "phone": "13 99855-8985",
+    "status": "offline"
+  },
+  {
+    "name": "Augustinho Lopes",
+    "mail": "luas.arosse@hf.com",
+    "document": "345.546.887-99",
+    "phone": "13 99855-8985",
+    "status": "disabled"
   }
 ]
