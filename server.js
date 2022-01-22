@@ -34,8 +34,7 @@ router.post("/accounts", (req, res) => {
 
   accountsFileData.push(user);
   fs.writeFileSync("./db.json", JSON.stringify(accountsFileData));
-
-  return res.status(201).json(user);
+  return res.status(201).json(db);
 });
 
 router.put("/accounts/:id", (req, res) => {
@@ -44,7 +43,10 @@ router.put("/accounts/:id", (req, res) => {
   );
   let bodyRequest = req.body;
   const user = req.params.id;
-  const account = users[user];
+  const account = [
+    ...users[user],
+    (users[user].phone = `${users[user].phone.slice}`),
+  ];
 
   if (!account) {
     res.status(404).json({ error: "User doesn't exists" });
@@ -60,5 +62,3 @@ app.use(apiRoot, router);
 app.listen(port, () => {
   console.log("Server is running...");
 });
-
-//LETS USE STRING TEMPLATE ON THE PUT VIA REACT!!!!!!!!!!!!!
