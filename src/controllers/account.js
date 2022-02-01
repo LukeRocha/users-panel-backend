@@ -1,5 +1,4 @@
 const fs = require("fs");
-const db = require("../db.json");
 const get = (req, res) => {
   fs.readFile("./db.json", { encoding: "utf8", flag: "r" }, (err, data) => {
     res.send(data);
