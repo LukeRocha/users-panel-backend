@@ -1,5 +1,5 @@
 const fs = require("fs");
-
+const db = require("../db.json");
 const get = (req, res) => {
   fs.readFile("./db.json", { encoding: "utf8", flag: "r" }, (err, data) => {
     res.send(data);
@@ -17,8 +17,12 @@ const create = (req, res) => {
     phone: bodyRequest.phone,
     status: bodyRequest.status,
   };
+
   accountsFileData.push(user);
-  fs.writeFile("./db.json", JSON.stringify(accountsFileData));
+  fs.writeFile("./db.json", JSON.stringify(accountsFileData), (err) => {
+    err ? console.log("error: ", err) : console.log("user created");
+  });
+
   return res.status(201).json(accountsFileData);
 };
 
@@ -38,9 +42,10 @@ const edit = (req, res) => {
       if (err) {
         console.log(err);
       } else {
-        return res.status(201).json(user);
+        return res.status(201).json(data);
       }
     });
+    res.send(users);
   });
 };
 
