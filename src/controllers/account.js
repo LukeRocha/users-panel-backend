@@ -1,5 +1,4 @@
 const fs = require("fs");
-//user validation
 const yup = require("yup");
 const userSchema = yup.object().shape({
   name: yup.string().required(),
@@ -48,9 +47,11 @@ const edit = async (req, res) => {
       const user = req.params.id;
       const account = users[user];
       const isValid = await userSchema.isValid(account);
+
       if (!account) {
         res.status(404).json({ error: "User doesn't exists" });
       }
+
       if (isValid) {
         users[user] = bodyRequest;
       } else {
