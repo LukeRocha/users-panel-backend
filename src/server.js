@@ -17,7 +17,7 @@ const router = express.Router();
 
 router.get("/accounts", accountController.get);
 
-router.post("/accounts", accountController.create);
+router.post("/accounts", accountController.greate);
 
 router.put("/accounts/:id", accountController.edit);
 app.use(apiRoot, router);

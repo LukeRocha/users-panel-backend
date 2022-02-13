@@ -1,4 +1,5 @@
 const fs = require("fs");
+const pool = require("../postgres-api/db");
 const yup = require("yup");
 const userSchema = yup.object().shape({
   name: yup.string().required(),
@@ -7,10 +8,31 @@ const userSchema = yup.object().shape({
   phone: yup.number().required().positive().integer().min(11),
 });
 
-const get = (req, res) => {
-  fs.readFile("./db.json", { encoding: "utf8", flag: "r" }, (err, data) => {
-    res.send(data);
-  });
+const get = async (req, res) => {
+  try {
+    const getUsers = await pool.query("SELECT * FROM users_data");
+    res.json(getUsers.rows);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const greate = async (req, res) => {
+  const text =
+    'INSERT INTO users_data("user_name", "user_mail", "user_document", "user_phone", "user_status") VALUES($1, $2, $3, $4, $5) RETURNING *';
+  const user = [
+    req.body.name,
+    req.body.mail,
+    req.body.document,
+    req.body.phone,
+    req.body.status,
+  ];
+  const isValid = await userSchema.isValid(user);
+  console.log(isValid);
+  try {
+    const sendNewUser = await pool.query(text, user);
+    res.json(sendNewUser.rows);
+  } catch (error) {}
 };
 
 const create = async (req, res) => {
@@ -70,4 +92,4 @@ const edit = async (req, res) => {
   );
 };
 
-module.exports = { get, create, edit };
+module.exports = { get, greate, edit };
