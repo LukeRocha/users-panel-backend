@@ -35,7 +35,7 @@ app.post("/accounts", async (req, res) => {
     console.error(err.message);
   }
 });
-
+//git checkout <sua-branch> && git pull origin <sua-branch>
 //put(edit) a user method
 
 app.listen(5550, () => {
