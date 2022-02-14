@@ -19,8 +19,8 @@ router.get("/accounts", accountController.get);
 
 router.post("/accounts", accountController.create);
 
-// router.put("/accounts/:id", accountController.edit);
-// app.use(apiRoot, router);
+router.put("/accounts/:id", accountController.edit);
+app.use(apiRoot, router);
 
 app.listen(port, () => {
   console.log("Server is running...");

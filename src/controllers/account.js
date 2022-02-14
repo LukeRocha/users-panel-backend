@@ -1,15 +1,19 @@
 const pool = require("../postgres-api/db");
 const yup = require("yup");
-const userSchema = yup.object().shape({
-  name: yup.string().required(),
-  mail: yup.string().email(),
-  document: yup.number().required().positive().integer().min(11),
-  phone: yup.number().required().positive().integer().min(11),
+const userSchema = yup.object({
+  body: yup.object({
+    user_name: yup.string().required(),
+    user_mail: yup.string().email(),
+    user_document: yup.number().required().positive().integer().min(11),
+    user_phone: yup.number().required().positive().integer().min(11),
+  }),
 });
 
 const get = async (req, res) => {
   try {
-    const getUsers = await pool.query("SELECT * FROM users_data");
+    const getUsers = await pool.query(
+      "SELECT * FROM users_data ORDER BY id ASC"
+    );
     res.json(getUsers.rows);
   } catch (err) {
     console.error(err);
@@ -17,54 +21,49 @@ const get = async (req, res) => {
 };
 
 const create = async (req, res) => {
-  const text =
+  const queryText =
     'INSERT INTO users_data("user_name", "user_mail", "user_document", "user_phone", "user_status") VALUES($1, $2, $3, $4, $5) RETURNING *';
+
   const user = [
-    req.body.name,
-    req.body.mail,
-    req.body.document,
-    req.body.phone,
-    req.body.status,
+    req.body.user_name,
+    req.body.user_mail,
+    req.body.user_document,
+    req.body.user_phone,
+    req.body.user_status,
   ];
-  const isValid = await userSchema.isValid(user);
-  console.log(isValid);
+
+  const isValid = await userSchema.isValid({ body: req.body });
+
   try {
-    const sendNewUser = await pool.query(text, user);
-    res.json(sendNewUser.rows);
-  } catch (error) {}
+    if (isValid) {
+      const sendNewUser = await pool.query(queryText, user);
+      res.json(sendNewUser.rows);
+    } else {
+      console.log("error");
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-// const edit = async (req, res) => {
-//   fs.readFile(
-//     "./db.json",
-//     { encoding: "utf8", flag: "r" },
-//     async (error, users) => {
-//       users = JSON.parse(users);
-//       let bodyRequest = req.body;
-//       const user = req.params.id;
-//       const account = users[user];
-//       const isValid = await userSchema.isValid(account);
+const edit = async (req, res) => {
+  const queryText =
+    "UPDATE users_data SET user_name = ($1), user_mail = ($2), user_document =($3), user_phone = ($4), user_status = ($5) WHERE id = ($6)";
+  let id = parseInt(req.params.id + 1);
+  try {
+    console.log(id);
+    const updateUser = await pool.query(queryText, [
+      req.body.user_name,
+      req.body.user_mail,
+      req.body.user_document,
+      req.body.user_phone,
+      req.body.user_status,
+      id,
+    ]);
+    res.json("user edited");
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-//       if (!account) {
-//         res.status(404).json({ error: "User doesn't exists" });
-//       }
-
-//       if (isValid) {
-//         users[user] = bodyRequest;
-//       } else {
-//         return console.log("Error: Please, input valid info");
-//       }
-
-//       fs.writeFile("./db.json", JSON.stringify(users), (err, data) => {
-//         if (err) {
-//           console.log(err);
-//         } else {
-//           return res.status(201).json(data);
-//         }
-//       });
-//       res.send(users);
-//     }
-//   );
-// };
-
-module.exports = { get, create };
+module.exports = { get, create, edit };
