@@ -1,4 +1,4 @@
-const pool = require("../postgres-api/db");
+const pool = require("../postgres/db");
 const yup = require("yup");
 const userSchema = yup.object({
   body: yup.object({
@@ -31,8 +31,6 @@ const create = async (req, res) => {
     req.body.user_phone,
     req.body.user_status,
   ];
-
-  console.log(isValid);
   try {
     if (isValid) {
       const sendNewUser = await pool.query(queryText, user);
@@ -47,7 +45,6 @@ const edit = async (req, res) => {
   const queryText =
     "UPDATE users_data SET user_name = ($1), user_mail = ($2), user_document =($3), user_phone = ($4), user_status = ($5) WHERE id  = ($6) + 1";
   let id = parseInt(req.params.id);
-  console.log(id);
   const isValid = await userSchema.isValid({ body: req.body });
   try {
     if (isValid) {
