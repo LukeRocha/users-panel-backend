@@ -23,7 +23,7 @@ const get = async (req, res) => {
 const create = async (req, res) => {
   const queryText =
     'INSERT INTO users_data("user_name", "user_mail", "user_document", "user_phone", "user_status") VALUES($1, $2, $3, $4, $5) RETURNING *';
-
+  const isValid = await userSchema.isValid({ body: req.body });
   const user = [
     req.body.user_name,
     req.body.user_mail,
@@ -32,14 +32,11 @@ const create = async (req, res) => {
     req.body.user_status,
   ];
 
-  const isValid = await userSchema.isValid({ body: req.body });
-
+  console.log(isValid);
   try {
     if (isValid) {
       const sendNewUser = await pool.query(queryText, user);
       res.json(sendNewUser.rows);
-    } else {
-      console.log("error");
     }
   } catch (error) {
     console.log(error);
@@ -48,19 +45,22 @@ const create = async (req, res) => {
 
 const edit = async (req, res) => {
   const queryText =
-    "UPDATE users_data SET user_name = ($1), user_mail = ($2), user_document =($3), user_phone = ($4), user_status = ($5) WHERE id = ($6)";
-  let id = parseInt(req.params.id + 1);
+    "UPDATE users_data SET user_name = ($1), user_mail = ($2), user_document =($3), user_phone = ($4), user_status = ($5) WHERE id  = ($6) + 1";
+  let id = parseInt(req.params.id);
+  console.log(id);
+  const isValid = await userSchema.isValid({ body: req.body });
   try {
-    console.log(id);
-    const updateUser = await pool.query(queryText, [
-      req.body.user_name,
-      req.body.user_mail,
-      req.body.user_document,
-      req.body.user_phone,
-      req.body.user_status,
-      id,
-    ]);
-    res.json("user edited");
+    if (isValid) {
+      await pool.query(queryText, [
+        req.body.user_name,
+        req.body.user_mail,
+        req.body.user_document,
+        req.body.user_phone,
+        req.body.user_status,
+        id,
+      ]);
+      res.json("updateUser");
+    }
   } catch (err) {
     console.log(err);
   }
