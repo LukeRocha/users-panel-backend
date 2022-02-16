@@ -1,12 +1,10 @@
 const pool = require("../postgres/db");
 const yup = require("yup");
 const userSchema = yup.object({
-  body: yup.object({
-    user_name: yup.string().required(),
-    user_mail: yup.string().email(),
-    user_document: yup.number().required().positive().integer().min(11),
-    user_phone: yup.number().required().positive().integer().min(11),
-  }),
+  user_name: yup.string().required(),
+  user_mail: yup.string().email(),
+  user_document: yup.string().required().min(11),
+  user_phone: yup.string().required().min(11),
 });
 
 const get = async (req, res) => {
@@ -23,17 +21,19 @@ const get = async (req, res) => {
 const create = async (req, res) => {
   const queryText =
     'INSERT INTO users_data("user_name", "user_mail", "user_document", "user_phone", "user_status") VALUES($1, $2, $3, $4, $5) RETURNING *';
-  const isValid = await userSchema.isValid({ body: req.body });
-  const user = [
+  const isValid = await userSchema.isValid(req.body);
+
+  const newUser = [
     req.body.user_name,
     req.body.user_mail,
     req.body.user_document,
     req.body.user_phone,
-    req.body.user_status,
+    req.body.user_status.toLowerCase(),
   ];
+
   try {
     if (isValid) {
-      const sendNewUser = await pool.query(queryText, user);
+      const sendNewUser = await pool.query(queryText, newUser);
       res.json(sendNewUser.rows);
     }
   } catch (error) {
@@ -43,23 +43,23 @@ const create = async (req, res) => {
 
 const edit = async (req, res) => {
   const queryText =
-    "UPDATE users_data SET user_name = ($1), user_mail = ($2), user_document =($3), user_phone = ($4), user_status = ($5) WHERE id  = ($6) + 1";
-  let id = parseInt(req.params.id);
-  const isValid = await userSchema.isValid({ body: req.body });
+    "UPDATE users_data SET user_name = ($1), user_mail = ($2), user_document =($3), user_phone = ($4), user_status = ($5) WHERE id  = ($6)";
+  const isValid = await userSchema.isValid(req.body);
   try {
     if (isValid) {
-      await pool.query(queryText, [
+      const updateUsers = await pool.query(queryText, [
         req.body.user_name,
         req.body.user_mail,
         req.body.user_document,
         req.body.user_phone,
-        req.body.user_status,
-        id,
+        req.body.user_status.toLowerCase(),
+        req.params.id,
       ]);
-      res.json("updateUser");
+      const result = await pool.query("SELECT * FROM users_data ORDER BY id");
+      res.send(result.rows);
     }
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    console.log(error);
   }
 };
 
