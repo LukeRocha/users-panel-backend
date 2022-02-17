@@ -1,4 +1,4 @@
-const pool = require("../postgres/db");
+const db = require("../postgres/db");
 const yup = require("yup");
 const userSchema = yup.object({
   user_name: yup.string().required(),
@@ -9,7 +9,7 @@ const userSchema = yup.object({
 
 const get = async (req, res) => {
   try {
-    const getUsers = await pool.query(
+    const getUsers = await db.pool.query(
       "SELECT * FROM users_data ORDER BY id ASC"
     );
     res.json(getUsers.rows);
@@ -24,17 +24,26 @@ const create = async (req, res) => {
   const isValid = await userSchema.isValid(req.body);
 
   const newUser = [
-    req.body.user_name,
-    req.body.user_mail,
-    req.body.user_document,
-    req.body.user_phone,
-    req.body.user_status.toLowerCase(),
+    {
+      user_name: req.body.user_name,
+      user_mail: req.body.user_mail,
+      user_document: req.body.user_document,
+      user_phone: req.body.user_phone,
+      user_status: req.body.user_status.toLowerCase(),
+    },
   ];
 
   try {
     if (isValid) {
-      const sendNewUser = await pool.query(queryText, newUser);
-      res.json(sendNewUser.rows);
+      const atry = await db.knex
+        .insert(newUser)
+        .into("users_data")
+        .then((response) => {
+          console.log("User created");
+        })
+        .catch((err) => {
+          console.log("err");
+        });
     }
   } catch (error) {
     console.log(error);
@@ -47,7 +56,7 @@ const edit = async (req, res) => {
   const isValid = await userSchema.isValid(req.body);
   try {
     if (isValid) {
-      const updateUsers = await pool.query(queryText, [
+      const updateUsers = await db.pool.query(queryText, [
         req.body.user_name,
         req.body.user_mail,
         req.body.user_document,
@@ -55,7 +64,9 @@ const edit = async (req, res) => {
         req.body.user_status.toLowerCase(),
         req.params.id,
       ]);
-      const result = await pool.query("SELECT * FROM users_data ORDER BY id");
+      const result = await db.pool.query(
+        "SELECT * FROM users_data ORDER BY id"
+      );
       res.send(result.rows);
     }
   } catch (error) {
