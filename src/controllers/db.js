@@ -1,13 +1,3 @@
-const Pool = require("pg").Pool;
-
-const pool = new Pool({
-  user: "postgres",
-  password: "postgres",
-  database: "UOL-users-panel",
-  host: "localhost",
-  port: 5432,
-});
-
 const knex = require("knex")({
   client: "pg",
   connection: {
@@ -19,4 +9,4 @@ const knex = require("knex")({
   },
 });
 
-module.exports = { pool, knex };
+module.exports = { knex };
