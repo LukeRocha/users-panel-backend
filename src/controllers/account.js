@@ -9,20 +9,19 @@ const userSchema = yup.object({
 
 const get = async (req, res) => {
   try {
-    const getUsers = await db.pool.query(
-      "SELECT * FROM users_data ORDER BY id ASC"
-    );
-    res.json(getUsers.rows);
+    db.knex
+      .select()
+      .table("users_data")
+      .then((data) => {
+        res.json(data);
+      });
   } catch (err) {
     console.error(err);
   }
 };
 
 const create = async (req, res) => {
-  const queryText =
-    'INSERT INTO users_data("user_name", "user_mail", "user_document", "user_phone", "user_status") VALUES($1, $2, $3, $4, $5) RETURNING *';
   const isValid = await userSchema.isValid(req.body);
-
   const newUser = [
     {
       user_name: req.body.user_name,
@@ -35,14 +34,14 @@ const create = async (req, res) => {
 
   try {
     if (isValid) {
-      const atry = await db.knex
+      const postNewUser = await db.knex
         .insert(newUser)
         .into("users_data")
         .then((response) => {
-          console.log("User created");
+          console.log("User created", response.rows);
         })
         .catch((err) => {
-          console.log("err");
+          console.log("Error", err);
         });
     }
   } catch (error) {
