@@ -57,12 +57,14 @@ const edit = async (req, res) => {
   try {
     if (isValid) {
       const updateUsers = await db.pool.query(queryText, [
-        req.body.user_name,
-        req.body.user_mail,
-        req.body.user_document,
-        req.body.user_phone,
-        req.body.user_status.toLowerCase(),
-        req.params.id,
+        {
+          user_name: req.body.user_name,
+          user_mail: req.body.user_mail,
+          user_document: req.body.user_document,
+          user_phone: req.body.user_phone,
+          user_status: req.body.user_status.toLowerCase(),
+          id: req.params.id,
+        },
       ]);
       const result = await db.pool.query(
         "SELECT * FROM users_data ORDER BY id"
