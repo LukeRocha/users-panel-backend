@@ -68,7 +68,7 @@ const edit = async (req, res) => {
         .table("users_data")
         .update(updatedUser);
       const result = await db.knex.select().table("users_data").orderBy("id");
-      res.send(result.rows);
+      res.send(result);
     }
   } catch (error) {
     console.log(error);
