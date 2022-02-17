@@ -1,4 +1,4 @@
-const db = require("../postgres/db");
+const db = require("./db");
 const yup = require("yup");
 const userSchema = yup.object({
   user_name: yup.string().required(),
