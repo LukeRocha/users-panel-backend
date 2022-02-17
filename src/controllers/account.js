@@ -12,6 +12,7 @@ const get = async (req, res) => {
     db.knex
       .select()
       .table("users_data")
+      .orderBy("id")
       .then((data) => {
         res.json(data);
       });
@@ -50,24 +51,23 @@ const create = async (req, res) => {
 };
 
 const edit = async (req, res) => {
-  const queryText =
-    "UPDATE users_data SET user_name = ($1), user_mail = ($2), user_document =($3), user_phone = ($4), user_status = ($5) WHERE id  = ($6)";
   const isValid = await userSchema.isValid(req.body);
+  const updatedUser = {
+    user_name: req.body.user_name,
+    user_mail: req.body.user_mail,
+    user_document: req.body.user_document,
+    user_phone: req.body.user_phone,
+    user_status: req.body.user_status.toLowerCase(),
+    id: req.params.id,
+  };
+
   try {
     if (isValid) {
-      const updateUsers = await db.pool.query(queryText, [
-        {
-          user_name: req.body.user_name,
-          user_mail: req.body.user_mail,
-          user_document: req.body.user_document,
-          user_phone: req.body.user_phone,
-          user_status: req.body.user_status.toLowerCase(),
-          id: req.params.id,
-        },
-      ]);
-      const result = await db.pool.query(
-        "SELECT * FROM users_data ORDER BY id"
-      );
+      const updateUser = await db.knex
+        .where({ id: req.params.id })
+        .table("users_data")
+        .update(updatedUser);
+      const result = await db.knex.select().table("users_data").orderBy("id");
       res.send(result.rows);
     }
   } catch (error) {
