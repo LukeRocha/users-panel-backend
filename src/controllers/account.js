@@ -26,7 +26,6 @@ const create = async (req, res) => {
   const isValid = await userSchema.isValid(req.body);
   const newUser = [
     {
-      is_deleted: 1,
       user_name: req.body.user_name,
       user_mail: req.body.user_mail,
       user_document: req.body.user_document,
@@ -41,7 +40,7 @@ const create = async (req, res) => {
         .insert(newUser)
         .into("users_data")
         .then((response) => {
-          console.log("User created", response.rows);
+          console.log("User created: ", req.user_name);
         })
         .catch((err) => {
           console.log("Error", err);
