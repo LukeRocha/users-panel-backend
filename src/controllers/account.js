@@ -10,8 +10,9 @@ const userSchema = yup.object({
 const get = async (req, res) => {
   try {
     db.knex
-      .select()
+      .select("*")
       .table("users_data")
+      .where("is_deleted", null)
       .orderBy("id")
       .then((data) => {
         res.json(data);
@@ -25,6 +26,7 @@ const create = async (req, res) => {
   const isValid = await userSchema.isValid(req.body);
   const newUser = [
     {
+      is_deleted: 1,
       user_name: req.body.user_name,
       user_mail: req.body.user_mail,
       user_document: req.body.user_document,
@@ -67,7 +69,14 @@ const edit = async (req, res) => {
         .where({ id: req.params.id })
         .table("users_data")
         .update(updatedUser);
-      const result = await db.knex.select().table("users_data").orderBy("id");
+      const result = await db.knex
+        .select("*")
+        .table("users_data")
+        .where("is_deleted", null)
+        .orderBy("id")
+        .then((data) => {
+          res.json(data);
+        });
       res.send(result);
     }
   } catch (error) {
@@ -75,4 +84,22 @@ const edit = async (req, res) => {
   }
 };
 
-module.exports = { get, create, edit };
+const softDelete = async (req, res) => {
+  const updateSoftDelete = {
+    is_deleted: "1",
+  };
+
+  try {
+    const deleteUser = db.knex
+      .where("id", req.params.id)
+      .table("users_data")
+      .update(updateSoftDelete)
+      .then((data) => {
+        res.json(data);
+      });
+  } catch (err) {
+    console.log(error);
+  }
+};
+
+module.exports = { get, create, edit, softDelete };

@@ -20,6 +20,8 @@ router.get("/accounts", accountController.get);
 router.post("/accounts", accountController.create);
 
 router.put("/accounts/:id", accountController.edit);
+
+router.put("/accounts/delete/:id", accountController.softDelete);
 app.use(apiRoot, router);
 
 app.listen(port, () => {
