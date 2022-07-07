@@ -1,4 +1,4 @@
-const db = require("./db");
+const db = require("../database/db");
 const yup = require("yup");
 const userSchema = yup.object({
   user_name: yup.string().required(),
@@ -40,7 +40,7 @@ const create = async (req, res) => {
         .insert(newUser)
         .into("users_data")
         .then((response) => {
-          console.log("User created: ", req.user_name);
+          console.log("User created: ", newUser.user_name);
         })
         .catch((err) => {
           console.log("Error", err);
